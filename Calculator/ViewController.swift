@@ -11,7 +11,7 @@ import UIKit
 class ViewController: UIViewController {
 
     @IBOutlet weak var display: UILabel!
-    var isSetToZero: Bool = true
+    var isSetToZero = true
     
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -27,7 +27,7 @@ class ViewController: UIViewController {
         
         // var = variable, let = constante
         let digit = sender.currentTitle!
-        if(!isSetToZero) {
+        if !isSetToZero {
             display.text = display.text! + digit
         }
         else {
@@ -38,6 +38,53 @@ class ViewController: UIViewController {
         //println("digit = \(digit)")
         
     }
+    
+    var operandStack = Array<Double>()
 
+    @IBAction func enter() {
+        
+        isSetToZero = true
+        operandStack.append(displayValue)
+        println("stack = \(operandStack)")
+        
+    }
+    
+    var displayValue: Double {
+        set {
+            display.text = "\(newValue)"
+            isSetToZero = true
+        }
+        get {
+            return NSNumberFormatter().numberFromString(display.text!)!.doubleValue
+        }
+    }
+    
+    @IBAction func operate(sender: UIButton) {
+        let operation = sender.currentTitle!
+        
+        if !isSetToZero {
+            enter()
+        }
+        
+        switch operation {
+        case "✕": performOperation { $0 * $1 }
+        case "÷": performOperation { $1 / $0 }
+        case "−": performOperation { $1 - $0 }
+        case "+": performOperation { $0 + $1 }
+        default: break
+        }
+        
+    }
+    
+    
+    func performOperation (operation: (Double, Double) -> Double) {
+        if operandStack.count >= 2 {
+            displayValue = operandStack.removeLast() * operandStack.removeLast()
+            enter()
+        }
+    }
+ 
+    
+    
 }
 
