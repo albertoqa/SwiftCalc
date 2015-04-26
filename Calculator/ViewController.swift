@@ -11,7 +11,9 @@ import UIKit
 class ViewController: UIViewController {
 
     @IBOutlet weak var display: UILabel!
+    
     var isSetToZero = true
+    var brain = CalculatorBrain()
     
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -24,7 +26,6 @@ class ViewController: UIViewController {
     }
 
     @IBAction func appendDigit(sender: UIButton) {
-        
         // var = variable, let = constante
         let digit = sender.currentTitle!
         if !isSetToZero {
@@ -34,19 +35,17 @@ class ViewController: UIViewController {
             display.text = digit
             isSetToZero = false
         }
-        
         //println("digit = \(digit)")
         
     }
     
-    var operandStack = Array<Double>()
-
     @IBAction func enter() {
-        
         isSetToZero = true
-        operandStack.append(displayValue)
-        println("stack = \(operandStack)")
-        
+        if let result = brain.pushOperand(displayValue) {
+            displayValue = result
+        } else {
+            displayValue = 0
+        }
     }
     
     var displayValue: Double {
@@ -60,30 +59,18 @@ class ViewController: UIViewController {
     }
     
     @IBAction func operate(sender: UIButton) {
-        let operation = sender.currentTitle!
-        
         if !isSetToZero {
             enter()
         }
-        
-        switch operation {
-        case "✕": performOperation { $0 * $1 }
-        case "÷": performOperation { $1 / $0 }
-        case "−": performOperation { $1 - $0 }
-        case "+": performOperation { $0 + $1 }
-        default: break
+        if let operation = sender.currentTitle {
+            if let result = brain.performOperation(operation) {
+                displayValue = result
+            } else {
+                displayValue = 0
+            }
         }
-        
+
     }
-    
-    
-    func performOperation (operation: (Double, Double) -> Double) {
-        if operandStack.count >= 2 {
-            displayValue = operation(operandStack.removeLast(), operandStack.removeLast())
-            enter()
-        }
-    }
- 
     
     
 }
